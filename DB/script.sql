@@ -1,0 +1,21 @@
+CREATE TABLE users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  username TEXT UNIQUE,
+  password TEXT
+);
+
+CREATE TABLE questions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  question TEXT,
+  choices TEXT,
+  answer TEXT,
+  explanation TEXT
+);
+
+CREATE TABLE scores (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  username TEXT,
+  score INTEGER,
+  total INTEGER,
+  takenAt DATETIME DEFAULT CURRENT_TIMESTAMP
+);

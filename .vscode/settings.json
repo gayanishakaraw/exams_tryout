@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/4c9cf27c-90d5-48b6-8c50-f93a6c0289d0/resourceGroups/learning_rg/providers/Microsoft.Web/sites/trymyexams",
+    "appService.deploySubpath": "."
+}

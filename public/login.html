@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="registration-card" display="none">
+    <h3>Register</h3>
+    <input class="txt-input" id="regusername" placeholder="Username">
+    <input class="txt-input" id="regname" placeholder="Name">
+    <input class="txt-input" id="regpassword" type="password" placeholder="Password">
+    <button class="login-btn" onclick="register()">Register</button>
+    
+    <span id="switchText" class="switch-link" onclick="toggleForm()">
+        Already have an account? Login
+    </span>
+    <p id="msg"></p>
+</div>
+
+<div class="login-card">
+  <h3>Login</h3>
+  <input class="txt-input" id="username" placeholder="Username">
+  <input class="txt-input" id="password" type="password" placeholder="Password">
+  <button class="login-btn" onclick="login()">Login</button>
+
+  <span id="switchText" class="switch-link" onclick="toggleForm()">
+    Create an account
+  </span>
+  <p id="msg"></p>
+</div>
+</body>
+<script>
+let isRegister = false;
+
+toggleForm();
+
+function toggleForm() {
+  isRegister = !isRegister;
+  const regCard = document.querySelector(".registration-card");
+  const loginCard = document.querySelector(".login-card");
+  const switchText = document.getElementById("switchText");
+  const msg = document.getElementById("msg");
+  msg.textContent = "";
+
+  if (isRegister) {
+    regCard.style.display = "block";
+    loginCard.style.display = "none";
+    switchText.textContent = "Already have an account? Login";
+  } else {
+    regCard.style.display = "none";
+    loginCard.style.display = "block";
+    switchText.textContent = "Create an account";
+  }
+}
+
+async function login() {
+  const res = await fetch("/api/auth/login", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      username: username.value,
+      password: password.value
+    })
+  });
+
+  if (!res.ok) {
+    msg.textContent = "Invalid credentials";
+    return;
+  }
+
+  const data = await res.json();
+  localStorage.setItem("token", data.token);
+  window.location = "/index.html";
+}
+
+async function register() {
+  const res = await fetch("/api/auth/register", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      username: regusername.value,
+      name: regname.value,
+      password: regpassword.value
+    })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    msg.textContent = data.message || "Registration failed";
+    return;
+  }
+
+  localStorage.setItem("token", data.token);
+  window.location = "/index.html";
+}
+
+async function submitForm() {
+  const user = username.value.trim();
+  const pass = password.value.trim();
+  const msg = document.getElementById("msg");
+
+  if (!user || !pass) {
+    msg.textContent = "Please fill all fields.";
+    return;
+  }
+
+  const endpoint = isRegister ? "/api/auth/register" : "/api/auth/login";
+
+  const res = await fetch(endpoint, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ username: user, password: pass })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    msg.textContent = data.error || "Something went wrong.";
+    return;
+  }
+
+  if (isRegister) {
+    msg.textContent = "Registration successful! Please log in.";
+    toggleForm(); // switch to login form automatically
+    return;
+  }
+
+  // Login successful
+  localStorage.setItem("token", data.token);
+  window.location = "/index.html";
+}
+</script>
+</html>

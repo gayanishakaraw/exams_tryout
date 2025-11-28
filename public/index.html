@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Quiz</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="timer" id="timer">Time: 00:00</div>
+
+    <div id="quiz"></div>
+
+    <button class="submit-btn" id="submitBtn" onclick="submitAnswers()">Submit</button>
+
+    <script src="app.js"></script>
+
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal-box">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <div id="result" class="card">
+                <h2>Your Score: <span id="score"></span></h2>
+                <div id="detailedResults"></div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

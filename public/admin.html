@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="card">
+  <h2>Admin Panel</h2>
+
+  <h3>Upload Excel File</h3>
+  <input type="file" id="excel" accept=".xlsx,.xls">
+  <button onclick="uploadFile()">Upload</button>
+
+  <p id="msg"></p>
+</div>
+
+<script>
+async function uploadFile() {
+  const file = excel.files[0];
+  const form = new FormData();
+  form.append("file", file);
+
+  const res = await fetch("/api/admin/upload", {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("token")
+    },
+    body: form
+  });
+
+  const data = await res.json();
+  msg.textContent = data.message;
+}
+</script>
+
+</body>
+</html>
