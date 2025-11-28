@@ -19,12 +19,15 @@ function auth(req, res, next) {
 
 router.get("/", auth, (req, res) => {
   const db = req.app.get("db");
+  const numberOfQuestions = req.query.limit || 60;
 
   db.all("SELECT * FROM questions", (err, rows) => {
     rows.forEach((r) => {
       r.choices = JSON.parse(r.choices);
     });
-    const selectedQuestions = rows.sort(() => Math.random() - 0.5).slice(0, 60);
+    const selectedQuestions = rows
+      .sort(() => Math.random() - 0.5)
+      .slice(0, numberOfQuestions);
     res.json(selectedQuestions);
   });
 });

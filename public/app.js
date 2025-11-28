@@ -11,7 +11,10 @@ setInterval(() => {
 }, 1000);
 
 async function loadQuiz() {
-  const res = await fetch("/api/questions", {
+  const params = new URLSearchParams(window.location.search);
+  const limit = params.get("limit");
+
+  const res = await fetch(`/api/questions${limit ? `?limit=${limit}` : '?limit=60'}`, {
     headers: { Authorization: "Bearer " + localStorage.getItem("token") },
   });
 
