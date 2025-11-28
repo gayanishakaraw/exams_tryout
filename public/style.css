@@ -196,6 +196,16 @@ h2 {
     display: inline-block;
 }
 
+.refresh-btn {
+    margin-top: 20px;
+    padding: 12px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    background-color: #ffc107;
+    color: white;
+    cursor: pointer;
+}
 
 /* ---------------------------------------------------
    📱 MOBILE RESPONSIVE RULES
@@ -244,6 +254,12 @@ h2 {
     }
 
     .submit-btn {
+        font-size: 16px;
+        padding: 12px;
+        width: 100%;
+    }
+
+    .refresh-btn {
         font-size: 16px;
         padding: 12px;
         width: 100%;
