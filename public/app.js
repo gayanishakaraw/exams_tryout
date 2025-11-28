@@ -18,6 +18,16 @@ async function loadQuiz() {
     headers: { Authorization: "Bearer " + localStorage.getItem("token") },
   });
 
+  const status = res.status;
+  if (status === 401 || status === 403) {
+    alert("Unauthorized! Please log in.");
+    window.location.href = "/login.html";
+    return;
+  } else if (status !== 200) {
+    alert("Failed to load quiz questions.");
+    return;
+  }
+
   questions = await res.json();
   const container = document.getElementById("quiz");
 
