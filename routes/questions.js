@@ -24,7 +24,7 @@ router.get("/", auth, (req, res) => {
     rows.forEach((r) => {
       r.choices = JSON.parse(r.choices);
     });
-    const selectedQuestions = rows.sort(() => Math.random() - 0.5).slice(0, 20);
+    const selectedQuestions = rows.sort(() => Math.random() - 0.5).slice(0, 60);
     res.json(selectedQuestions);
   });
 });
