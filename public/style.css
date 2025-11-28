@@ -157,6 +157,7 @@ h2 {
     margin: 100px auto;
     text-align: center;
 }
+
 .registration-card {
     background: white;
     padding: 30px;
@@ -166,6 +167,7 @@ h2 {
     margin: 100px auto;
     text-align: center;
 }
+
 .txt-input {
     width: 80%;
     padding: 10px;
@@ -192,4 +194,67 @@ h2 {
     color: #2196F3;
     text-decoration: underline;
     display: inline-block;
+}
+
+
+/* ---------------------------------------------------
+   📱 MOBILE RESPONSIVE RULES
+----------------------------------------------------*/
+
+@media (max-width: 600px) {
+    body {
+        margin: 10px;
+    }
+
+    h2 {
+        font-size: 20px;
+        text-align: center;
+    }
+
+    .question {
+        padding: 12px;
+    }
+
+    .choices button {
+        font-size: 15px;
+        padding: 10px;
+    }
+
+    .modal-box {
+        width: 95%;
+        padding: 18px;
+    }
+
+    .login-card,
+    .registration-card {
+        margin: 40px auto;
+        padding: 20px;
+        width: 90%;
+    }
+
+    .txt-input {
+        width: auto;
+        width: 80%;
+        font-size: 15px;
+    }
+
+    .login-btn {
+        width: 100%;
+        font-size: 16px;
+    }
+
+    .submit-btn {
+        font-size: 16px;
+        padding: 12px;
+        width: 100%;
+    }
+
+    .timer {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* styles for very small phones */
+
 }
