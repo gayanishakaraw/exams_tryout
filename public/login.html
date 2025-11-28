@@ -68,6 +68,7 @@ async function login() {
 
   if (!res.ok) {
     msg.textContent = "Invalid credentials";
+    alert("Login failed! Please check your username and password.");
     return;
   }
 
