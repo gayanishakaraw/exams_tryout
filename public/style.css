@@ -361,6 +361,44 @@ h2 {
   color: var(--text);
 }
 
+/* ---------- Score-review results + pager ---------- */
+.result-item {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-soft);
+  line-height: 1.5;
+}
+
+.result-item:last-child {
+  border-bottom: none;
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.pager-btn {
+  padding: 8px 16px;
+}
+
+.pager-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.page-indicator {
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 14px;
+  min-width: 96px;
+  text-align: center;
+}
+
 /* ---------- Profile / forms ---------- */
 .profile-section {
   padding: 16px 0;

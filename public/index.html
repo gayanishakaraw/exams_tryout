@@ -22,10 +22,15 @@
     <div id="modalOverlay" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-header">
-                <h2>Your Score</h2>
+                <h2 id="scoreSummary">Your Score</h2>
                 <span class="modal-close" onclick="closeModal()">&times;</span>
             </div>
-            <div id="result" class="card"></div>
+            <div id="resultsPage" class="card"></div>
+            <div class="pager" id="resultsPager">
+                <button type="button" class="btn btn-secondary pager-btn" id="prevPage" onclick="prevPage()">‹ Prev</button>
+                <span class="page-indicator" id="pageIndicator"></span>
+                <button type="button" class="btn btn-secondary pager-btn" id="nextPage" onclick="nextPage()">Next ›</button>
+            </div>
         </div>
     </div>
 

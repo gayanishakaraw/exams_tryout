@@ -2,6 +2,11 @@ let questions = [];
 let answers = {};
 let seconds = 0;
 
+// Score-review pagination state
+let resultBlocks = [];
+let currentPage = 0;
+const RESULTS_PER_PAGE = 5;
+
 function escapeHtml(s) {
   return String(s == null ? "" : s)
     .replace(/&/g, "&amp;")
@@ -88,7 +93,7 @@ function renderChoices(q, index) {
 function submitAnswers() {
   let score = 0;
   let total = questions.length;
-  let detailsHTML = "";
+  resultBlocks = [];
 
   questions.forEach((q, idx) => {
     const correct = q.answer.split(",").map((a) => a.trim());
@@ -99,7 +104,6 @@ function submitAnswers() {
     let questionScore = 0;
 
     const correctSet = new Set(correct);
-    const selectedSet = new Set(selected);
 
     const correctSelections = selected.filter((s) => correctSet.has(s));
     const wrongSelections = selected.filter((s) => !correctSet.has(s));
@@ -117,8 +121,8 @@ function submitAnswers() {
     if (q.explanation) {
       explanation = escapeHtml(q.explanation).replace(/\n/g, "<br/>");
     }
-    detailsHTML += `
-      <div>
+    resultBlocks.push(`
+      <div class="result-item">
         <b>Q${idx + 1}:</b>
         <span class="${questionScore === 1 ? "correct" : "wrong"}">
           ${Math.round(questionScore * 100)}% correct
@@ -134,21 +138,62 @@ function submitAnswers() {
                 }`
             : ""
         }
-        <br/>
-
-      </div><br/>
-    `;
+      </div>
+    `);
   });
 
-  document.getElementById("result").innerHTML = `
-    <h3>Score: ${score.toFixed(2)} / ${total}</h3>
-    ${detailsHTML}
-  `;
-
+  document.getElementById(
+    "scoreSummary"
+  ).textContent = `Score: ${score.toFixed(2)} / ${total}`;
+  currentPage = 0;
+  renderResultsPage();
   openModal();
 }
 
+function totalResultPages() {
+  return Math.max(1, Math.ceil(resultBlocks.length / RESULTS_PER_PAGE));
+}
+
+function renderResultsPage() {
+  const totalPages = totalResultPages();
+  currentPage = Math.min(Math.max(currentPage, 0), totalPages - 1);
+
+  const start = currentPage * RESULTS_PER_PAGE;
+  const pageBlocks = resultBlocks.slice(start, start + RESULTS_PER_PAGE);
+  document.getElementById("resultsPage").innerHTML = pageBlocks.join("");
+
+  const pager = document.getElementById("resultsPager");
+  pager.style.display = totalPages > 1 ? "flex" : "none";
+  document.getElementById(
+    "pageIndicator"
+  ).textContent = `Page ${currentPage + 1} of ${totalPages}`;
+  document.getElementById("prevPage").disabled = currentPage === 0;
+  document.getElementById("nextPage").disabled =
+    currentPage === totalPages - 1;
+}
+
+function prevPage() {
+  if (currentPage > 0) {
+    currentPage--;
+    renderResultsPage();
+    scrollModalTop();
+  }
+}
+
+function nextPage() {
+  if (currentPage < totalResultPages() - 1) {
+    currentPage++;
+    renderResultsPage();
+    scrollModalTop();
+  }
+}
+
+function scrollModalTop() {
+  document.getElementById("modalOverlay").scrollTop = 0;
+}
+
 function openModal() {
+  scrollModalTop();
   document.getElementById("modalOverlay").style.display = "flex";
 }
 
