@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { jwtSecret } = require("../config");
+const { auth } = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -57,6 +58,19 @@ router.post("/register", (req, res) => {
       }
     );
   });
+});
+
+router.get("/me", auth, (req, res) => {
+  const db = req.app.get("db");
+  db.get(
+    "SELECT username, name FROM users WHERE username = ?",
+    req.user,
+    (err, user) => {
+      if (err || !user)
+        return res.status(404).json({ message: "User not found" });
+      res.json({ username: user.username, name: user.name });
+    }
+  );
 });
 
 module.exports = router;
