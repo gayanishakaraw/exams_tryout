@@ -34,10 +34,4 @@
     <div class="copy">© 2026 Devtechinvento · Gayan N. Wimalarathna</div>`;
 
   document.body.appendChild(footer);
-
-  // The quiz page has a fixed bottom action bar; give the footer clearance so
-  // it isn't hidden behind it.
-  if (document.querySelector(".button-group")) {
-    footer.style.marginBottom = "84px";
-  }
 })();

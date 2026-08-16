@@ -39,10 +39,15 @@ h2 {
 }
 
 /* ---------- Header ---------- */
-.app-header {
+/* The wrapper (direct child of body) is the sticky element so it can stick
+   against the page scroll, not just within its own height. */
+#app-header {
   position: sticky;
   top: 0;
   z-index: 100;
+}
+
+.app-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -171,7 +176,7 @@ h2 {
 .page {
   max-width: 860px;
   margin: 0 auto;
-  padding: 24px 20px 120px;
+  padding: 24px 20px 32px;
 }
 
 .card {
@@ -289,14 +294,11 @@ h2 {
   display: flex;
   justify-content: center;
   gap: 15px;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
   background: var(--surface);
-  padding: 14px;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
-  z-index: 90;
+  padding: 16px;
+  margin-top: 8px;
+  border-top: 1px solid var(--border-soft);
+  border-radius: var(--radius);
 }
 
 /* ---------- Modal ---------- */
@@ -700,7 +702,7 @@ h2 {
 /* ---------- Responsive ---------- */
 @media (max-width: 600px) {
   .page {
-    padding: 16px 12px 120px;
+    padding: 16px 12px 24px;
   }
   .app-header {
     padding: 10px 14px;
