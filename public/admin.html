@@ -19,6 +19,14 @@
       <button class="btn btn-primary" onclick="uploadFile()">Upload</button>
       <p class="form-msg" id="msg"></p>
     </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>User Scores</h3>
+        <button class="btn btn-secondary" onclick="loadScores()">Refresh</button>
+      </div>
+      <div id="scoresBody"></div>
+    </div>
   </main>
 
   <script src="header.js"></script>
@@ -52,6 +60,72 @@
       msg.textContent = data.message;
       msg.className = "form-msg ok";
     }
+
+    function escapeHtml(s) {
+      return String(s == null ? "" : s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function formatDate(s) {
+      if (!s) return "";
+      const d = new Date(String(s).replace(" ", "T") + "Z");
+      return isNaN(d.getTime()) ? String(s) : d.toLocaleString();
+    }
+
+    async function loadScores() {
+      const body = document.getElementById("scoresBody");
+      body.innerHTML = "<p class='hint'>Loading…</p>";
+      try {
+        const res = await fetch("/api/questions/scores", {
+          headers: { Authorization: "Bearer " + localStorage.getItem("token") },
+        });
+        if (!res.ok) {
+          body.innerHTML =
+            "<p class='form-msg error'>" +
+            (res.status === 403
+              ? "Admin access required."
+              : "Failed to load scores.") +
+            "</p>";
+          return;
+        }
+        renderScores(await res.json());
+      } catch (e) {
+        body.innerHTML = "<p class='form-msg error'>Failed to load scores.</p>";
+      }
+    }
+
+    function renderScores(rows) {
+      const body = document.getElementById("scoresBody");
+      if (!rows.length) {
+        body.innerHTML = "<p class='hint'>No attempts yet.</p>";
+        return;
+      }
+      const rowsHtml = rows
+        .map((r) => {
+          const pct = r.total > 0 ? Math.round((r.score / r.total) * 100) : 0;
+          return `
+            <tr>
+              <td>${escapeHtml(r.username)}</td>
+              <td>${escapeHtml(r.score)} / ${escapeHtml(r.total)}</td>
+              <td class="num">${pct}%</td>
+              <td>${escapeHtml(formatDate(r.takenAt))}</td>
+            </tr>`;
+        })
+        .join("");
+      body.innerHTML = `
+        <table class="data-table">
+          <thead>
+            <tr><th>User</th><th>Score</th><th class="num">%</th><th>Date</th></tr>
+          </thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>`;
+    }
+
+    loadScores();
   </script>
 </body>
 

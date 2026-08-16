@@ -436,6 +436,48 @@ h2 {
   color: var(--accent);
 }
 
+/* ---------- Admin data table ---------- */
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.card-head h3 {
+  margin: 0;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.data-table th,
+.data-table td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.data-table th {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+
+.data-table tbody tr:hover {
+  background: var(--accent-light);
+}
+
+.data-table .num {
+  text-align: right;
+  font-weight: 600;
+}
+
 /* ---------- Profile / forms ---------- */
 .profile-section {
   padding: 16px 0;
