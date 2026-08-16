@@ -66,8 +66,8 @@ router.get("/me", auth, (req, res) => {
     "SELECT username, name FROM users WHERE username = ?",
     req.user,
     (err, user) => {
-      if (err || !user)
-        return res.status(404).json({ message: "User not found" });
+      if (err) return res.status(500).json({ message: "Server error" });
+      if (!user) return res.status(404).json({ message: "User not found" });
       res.json({ username: user.username, name: user.name });
     }
   );
@@ -98,8 +98,8 @@ router.put("/password", auth, (req, res) => {
       .json({ message: "Current and new password required" });
 
   db.get("SELECT * FROM users WHERE username = ?", req.user, (err, user) => {
-    if (err || !user)
-      return res.status(404).json({ message: "User not found" });
+    if (err) return res.status(500).json({ message: "Server error" });
+    if (!user) return res.status(404).json({ message: "User not found" });
     if (!bcrypt.compareSync(currentPassword, user.password))
       return res.status(401).json({ message: "Current password is incorrect" });
 

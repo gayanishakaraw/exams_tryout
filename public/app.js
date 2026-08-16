@@ -2,6 +2,15 @@ let questions = [];
 let answers = {};
 let seconds = 0;
 
+function escapeHtml(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 // Timer (writes into the header slot once header.js has rendered it)
 setInterval(() => {
   seconds++;
@@ -37,9 +46,9 @@ async function loadQuiz() {
     const div = document.createElement("div");
     div.className = "question-card";
 
-    const question = q.question.replace(/\n/g, "<br/>");
+    const question = escapeHtml(q.question).replace(/\n/g, "<br/>");
     const explanation = q.explanation
-      ? q.explanation.replace(/\n/g, "<br/>")
+      ? escapeHtml(q.explanation).replace(/\n/g, "<br/>")
       : "";
     div.innerHTML = `
       <h3>${idx + 1}. ${question}</h3>
@@ -51,7 +60,7 @@ async function loadQuiz() {
       </div>
       <button type="button" class="reveal-btn" onclick="toggleAnswer(${idx})">See Answer</button>
       <div class="answer-box" id="answer_${idx}">
-        <b>Answer:</b> ${q.answer}
+        <b>Answer:</b> ${escapeHtml(q.answer)}
         ${explanation ? `<br/><b>Explanation:</b><br/>${explanation}` : ""}
       </div>
     `;
@@ -66,10 +75,10 @@ function renderChoices(q, index) {
       (c) => `
       <div>
         <label>
-          <input type="${q.multiple ? "checkbox" : "radio"}" 
-                 name="q_${index}" 
-                 value="${c.key}">
-          ${c.key}. ${c.value}
+          <input type="${q.multiple ? "checkbox" : "radio"}"
+                 name="q_${index}"
+                 value="${escapeHtml(c.key)}">
+          ${escapeHtml(c.key)}. ${escapeHtml(c.value)}
         </label>
       </div>`
     )
@@ -106,18 +115,18 @@ function submitAnswers() {
 
     let explanation = "";
     if (q.explanation) {
-      explanation = q.explanation.replace(/\n/g, "<br/>");
+      explanation = escapeHtml(q.explanation).replace(/\n/g, "<br/>");
     }
     detailsHTML += `
       <div>
-        <b>Q${idx + 1}:</b> 
+        <b>Q${idx + 1}:</b>
         <span class="${questionScore === 1 ? "correct" : "wrong"}">
-          ${Math.round(questionScore * 100)}% correct  
+          ${Math.round(questionScore * 100)}% correct
         </span>
         ${
           questionScore !== 1
             ? `<br/>
-                <b>Correct Answer(s):</b>${q.answer}
+                <b>Correct Answer(s):</b>${escapeHtml(q.answer)}
                 ${
                   q.explanation
                     ? `<br/><b>Explanation:</b><br/> ${explanation}`

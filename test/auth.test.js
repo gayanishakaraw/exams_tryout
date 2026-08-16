@@ -95,3 +95,60 @@ test("PUT /api/auth/password changes password and allows new login", async () =>
     await srv.close();
   }
 });
+
+test("POST /api/admin/upload with a non-admin token returns 403", async () => {
+  const srv = await setupServer();
+  try {
+    const registerRes = await fetch(`${srv.baseUrl}/api/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: "regular", password: "regular123" }),
+    });
+    const { token } = await registerRes.json();
+    assert.ok(token);
+
+    const res = await fetch(`${srv.baseUrl}/api/admin/upload`, {
+      method: "POST",
+      headers: { Authorization: "Bearer " + token },
+    });
+    assert.strictEqual(res.status, 403);
+  } finally {
+    await srv.close();
+  }
+});
+
+test("PUT /api/auth/profile with an empty name returns 400", async () => {
+  const srv = await setupServer();
+  try {
+    const token = await login(srv.baseUrl, "admin", "admin123");
+    const res = await fetch(`${srv.baseUrl}/api/auth/profile`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      body: JSON.stringify({ name: "   " }),
+    });
+    assert.strictEqual(res.status, 400);
+  } finally {
+    await srv.close();
+  }
+});
+
+test("PUT /api/auth/password with a missing field returns 400", async () => {
+  const srv = await setupServer();
+  try {
+    const token = await login(srv.baseUrl, "admin", "admin123");
+    const res = await fetch(`${srv.baseUrl}/api/auth/password`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      body: JSON.stringify({ currentPassword: "admin123" }),
+    });
+    assert.strictEqual(res.status, 400);
+  } finally {
+    await srv.close();
+  }
+});

@@ -7,6 +7,15 @@
 
   let currentUser = null;
 
+  function escapeHtml(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
   function initials(name, username) {
     const base = (name && name.trim()) || username || "?";
     const parts = base.trim().split(/\s+/);
@@ -25,8 +34,8 @@
           <div class="header-timer" id="headerTimer"></div>
           <div class="user-menu">
             <button class="user-menu-btn" id="userMenuBtn">
-              <span class="avatar">${initials(currentUser.name, currentUser.username)}</span>
-              <span class="user-name">${currentUser.name || currentUser.username}</span>
+              <span class="avatar">${escapeHtml(initials(currentUser.name, currentUser.username))}</span>
+              <span class="user-name">${escapeHtml(currentUser.name || currentUser.username)}</span>
               <span class="caret">&#9662;</span>
             </button>
             <div class="user-dropdown" id="userDropdown" hidden>
