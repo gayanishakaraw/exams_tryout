@@ -16,7 +16,6 @@
       <div class="foot-links">
         <a href="https://www.devtechinvento.com/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a>
         <a href="https://www.devtechinvento.com" target="_blank" rel="noopener">www.devtechinvento.com</a>
-        <a href="#" class="termly-display-preferences">Consent Preferences</a>
       </div>
       <div class="socials">
         <a href="https://www.linkedin.com/in/gayanwimalarathna/" target="_blank" rel="noopener" title="LinkedIn" aria-label="LinkedIn">
