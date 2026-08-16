@@ -73,4 +73,20 @@ router.get("/me", auth, (req, res) => {
   );
 });
 
+router.put("/profile", auth, (req, res) => {
+  const db = req.app.get("db");
+  const { name } = req.body;
+  if (!name || !name.trim())
+    return res.status(400).json({ message: "Name required" });
+
+  db.run(
+    "UPDATE users SET name = ? WHERE username = ?",
+    [name.trim(), req.user],
+    (err) => {
+      if (err) return res.status(500).json({ message: "Update failed" });
+      res.json({ message: "Profile updated", name: name.trim() });
+    }
+  );
+});
+
 module.exports = router;

@@ -27,3 +27,27 @@ test("GET /api/auth/me returns the current user", async () => {
     await srv.close();
   }
 });
+
+test("PUT /api/auth/profile updates the name", async () => {
+  const srv = await setupServer();
+  try {
+    const token = await login(srv.baseUrl, "admin", "admin123");
+    const res = await fetch(`${srv.baseUrl}/api/auth/profile`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      body: JSON.stringify({ name: "New Name" }),
+    });
+    assert.strictEqual(res.status, 200);
+    const me = await (
+      await fetch(`${srv.baseUrl}/api/auth/me`, {
+        headers: { Authorization: "Bearer " + token },
+      })
+    ).json();
+    assert.strictEqual(me.name, "New Name");
+  } finally {
+    await srv.close();
+  }
+});
