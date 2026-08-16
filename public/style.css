@@ -399,6 +399,43 @@ h2 {
   text-align: center;
 }
 
+/* ---------- Scores modal ---------- */
+.scores-modal {
+  max-width: 560px;
+}
+
+.scores-table .scores-row {
+  display: grid;
+  grid-template-columns: 1.7fr 1fr 0.7fr;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 14px;
+}
+
+.scores-table.admin .scores-row {
+  grid-template-columns: 1.7fr 1fr 1fr 0.7fr;
+}
+
+.scores-table .scores-row:last-child {
+  border-bottom: none;
+}
+
+.scores-head {
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+
+.scores-pct {
+  text-align: right;
+  font-weight: 600;
+  color: var(--accent);
+}
+
 /* ---------- Profile / forms ---------- */
 .profile-section {
   padding: 16px 0;

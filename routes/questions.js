@@ -31,4 +31,19 @@ router.post("/score", auth, (req, res) => {
   res.json({ message: "Score saved" });
 });
 
+// List attempts: the admin sees everyone's; any other user sees only their own.
+router.get("/scores", auth, (req, res) => {
+  const db = req.app.get("db");
+  const isAdmin = req.user === "admin";
+  const sql = isAdmin
+    ? "SELECT username, score, total, takenAt FROM scores ORDER BY takenAt DESC, id DESC"
+    : "SELECT username, score, total, takenAt FROM scores WHERE username = ? ORDER BY takenAt DESC, id DESC";
+  const params = isAdmin ? [] : [req.user];
+
+  db.all(sql, params, (err, rows) => {
+    if (err) return res.status(500).json({ message: "Failed to load scores" });
+    res.json(rows);
+  });
+});
+
 module.exports = router;

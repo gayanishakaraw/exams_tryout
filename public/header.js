@@ -79,6 +79,26 @@
           <button class="btn btn-primary" id="savePassword">Update password</button>
           <p class="form-msg" id="passwordMsg"></p>
         </section>
+        <section class="profile-section">
+          <button class="btn btn-secondary btn-block" id="openScores">My Scores</button>
+        </section>
+      </div>`;
+    document.body.appendChild(overlay);
+    injectScoresModal();
+  }
+
+  function injectScoresModal() {
+    if (document.getElementById("scoresModal")) return;
+    const overlay = document.createElement("div");
+    overlay.className = "modal-overlay";
+    overlay.id = "scoresModal";
+    overlay.innerHTML = `
+      <div class="modal-box scores-modal">
+        <div class="modal-header">
+          <h2 id="scoresTitle">My Scores</h2>
+          <span class="modal-close" id="scoresClose">&times;</span>
+        </div>
+        <div id="scoresBody" class="card"></div>
       </div>`;
     document.body.appendChild(overlay);
   }
@@ -115,6 +135,75 @@
     document
       .getElementById("savePassword")
       .addEventListener("click", savePassword);
+
+    document.getElementById("openScores").addEventListener("click", openScores);
+    const scoresModal = document.getElementById("scoresModal");
+    document
+      .getElementById("scoresClose")
+      .addEventListener("click", () => (scoresModal.style.display = "none"));
+    scoresModal.addEventListener("click", (e) => {
+      if (e.target === scoresModal) scoresModal.style.display = "none";
+    });
+  }
+
+  async function openScores() {
+    document.getElementById("profileModal").style.display = "none";
+    const admin = currentUser.username === "admin";
+    document.getElementById("scoresTitle").textContent = admin
+      ? "All Scores"
+      : "My Scores";
+    const body = document.getElementById("scoresBody");
+    body.innerHTML = "<p class='hint'>Loading…</p>";
+    document.getElementById("scoresModal").style.display = "flex";
+
+    try {
+      const res = await fetch("/api/questions/scores", {
+        headers: { Authorization: "Bearer " + token },
+      });
+      if (!res.ok) {
+        body.innerHTML = "<p class='form-msg error'>Failed to load scores.</p>";
+        return;
+      }
+      renderScores(await res.json(), admin);
+    } catch (e) {
+      body.innerHTML = "<p class='form-msg error'>Failed to load scores.</p>";
+    }
+  }
+
+  function renderScores(rows, admin) {
+    const body = document.getElementById("scoresBody");
+    if (!rows.length) {
+      body.innerHTML = "<p class='hint'>No attempts yet.</p>";
+      return;
+    }
+    const head = `
+      <div class="scores-row scores-head">
+        <span class="scores-date">Date</span>
+        ${admin ? '<span class="scores-user">User</span>' : ""}
+        <span class="scores-score">Score</span>
+        <span class="scores-pct">%</span>
+      </div>`;
+    const list = rows
+      .map((r) => {
+        const pct = r.total > 0 ? Math.round((r.score / r.total) * 100) : 0;
+        return `
+      <div class="scores-row">
+        <span class="scores-date">${escapeHtml(formatDate(r.takenAt))}</span>
+        ${admin ? `<span class="scores-user">${escapeHtml(r.username)}</span>` : ""}
+        <span class="scores-score">${escapeHtml(r.score)} / ${escapeHtml(r.total)}</span>
+        <span class="scores-pct">${pct}%</span>
+      </div>`;
+      })
+      .join("");
+    body.innerHTML = `<div class="scores-table${admin ? " admin" : ""}">${
+      head + list
+    }</div>`;
+  }
+
+  function formatDate(s) {
+    if (!s) return "";
+    const d = new Date(String(s).replace(" ", "T") + "Z");
+    return isNaN(d.getTime()) ? String(s) : d.toLocaleString();
   }
 
   async function saveProfile() {

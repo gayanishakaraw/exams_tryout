@@ -148,6 +148,24 @@ function submitAnswers() {
   currentPage = 0;
   renderResultsPage();
   openModal();
+  recordAttempt(score, total);
+}
+
+// Record this attempt for the logged-in user. Failure is logged, not surfaced —
+// it must never block the score review.
+async function recordAttempt(score, total) {
+  try {
+    await fetch("/api/questions/score", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+      body: JSON.stringify({ score: Number(score.toFixed(2)), total }),
+    });
+  } catch (e) {
+    console.error("Failed to record score", e);
+  }
 }
 
 function totalResultPages() {
