@@ -2,12 +2,14 @@ let questions = [];
 let answers = {};
 let seconds = 0;
 
-// Timer
+// Timer (writes into the header slot once header.js has rendered it)
 setInterval(() => {
   seconds++;
+  const el = document.getElementById("headerTimer");
+  if (!el) return;
   const m = String(Math.floor(seconds / 60)).padStart(2, "0");
   const s = String(seconds % 60).padStart(2, "0");
-  timer.textContent = `Time: ${m}:${s}`;
+  el.textContent = `⏱ ${m}:${s}`;
 }, 1000);
 
 async function loadQuiz() {
@@ -36,13 +38,21 @@ async function loadQuiz() {
     div.className = "question-card";
 
     const question = q.question.replace(/\n/g, "<br/>");
+    const explanation = q.explanation
+      ? q.explanation.replace(/\n/g, "<br/>")
+      : "";
     div.innerHTML = `
       <h3>${idx + 1}. ${question}</h3>
-      <div>
-      <div><small>${
-        q.multiple ? "(Select all that apply)" : "(Select one)"
-      }</small></div>
+      <div class="choice-row">
+        <div><small>${
+          q.multiple ? "(Select all that apply)" : "(Select one)"
+        }</small></div>
         ${renderChoices(q, idx)}
+      </div>
+      <button type="button" class="reveal-btn" onclick="toggleAnswer(${idx})">See Answer</button>
+      <div class="answer-box" id="answer_${idx}">
+        <b>Answer:</b> ${q.answer}
+        ${explanation ? `<br/><b>Explanation:</b><br/>${explanation}` : ""}
       </div>
     `;
 
@@ -122,7 +132,7 @@ function submitAnswers() {
   });
 
   document.getElementById("result").innerHTML = `
-    <h3>Your Score: ${score.toFixed(2)} / ${total}</h3>
+    <h3>Score: ${score.toFixed(2)} / ${total}</h3>
     ${detailsHTML}
   `;
 
@@ -145,5 +155,10 @@ document.addEventListener("click", function (event) {
     closeModal();
   }
 });
+
+function toggleAnswer(idx) {
+  const box = document.getElementById(`answer_${idx}`);
+  box.style.display = box.style.display === "block" ? "none" : "block";
+}
 
 loadQuiz();

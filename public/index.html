@@ -8,27 +8,29 @@
 </head>
 
 <body>
+    <div id="app-header"></div>
 
-    <div class="timer" id="timer">Time: 00:00</div>
+    <main class="page">
+        <div class="quiz-container" id="quiz"></div>
 
-    <div class="quiz-container" id="quiz"></div>
-
-    <div class="button-group">
-        <button class="submit-btn" id="submitBtn" onclick="submitAnswers()">Submit</button>
-        <button class="refresh-btn" onclick="window.location.reload()">Refresh</button>
-    </div>
-
-    <script src="app.js"></script>
+        <div class="button-group">
+            <button class="btn btn-primary submit-btn" id="submitBtn" onclick="submitAnswers()">Submit</button>
+            <button class="btn btn-secondary refresh-btn" onclick="window.location.reload()">Refresh</button>
+        </div>
+    </main>
 
     <div id="modalOverlay" class="modal-overlay">
         <div class="modal-box">
-            <span class="modal-close" onclick="closeModal()">&times;</span>
-            <div id="result" class="card">
-                <h2>Your Score: <span id="score"></span></h2>
-                <div id="detailedResults"></div>
+            <div class="modal-header">
+                <h2>Your Score</h2>
+                <span class="modal-close" onclick="closeModal()">&times;</span>
             </div>
+            <div id="result" class="card"></div>
         </div>
     </div>
+
+    <script src="header.js"></script>
+    <script src="app.js"></script>
 </body>
 
 </html>
