@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { jwtSecret } = require("../config");
+const { auth } = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -54,6 +55,61 @@ router.post("/register", (req, res) => {
           message: "Registration successful",
           token,
         });
+      }
+    );
+  });
+});
+
+router.get("/me", auth, (req, res) => {
+  const db = req.app.get("db");
+  db.get(
+    "SELECT username, name FROM users WHERE username = ?",
+    req.user,
+    (err, user) => {
+      if (err) return res.status(500).json({ message: "Server error" });
+      if (!user) return res.status(404).json({ message: "User not found" });
+      res.json({ username: user.username, name: user.name });
+    }
+  );
+});
+
+router.put("/profile", auth, (req, res) => {
+  const db = req.app.get("db");
+  const { name } = req.body;
+  if (!name || !name.trim())
+    return res.status(400).json({ message: "Name required" });
+
+  db.run(
+    "UPDATE users SET name = ? WHERE username = ?",
+    [name.trim(), req.user],
+    (err) => {
+      if (err) return res.status(500).json({ message: "Update failed" });
+      res.json({ message: "Profile updated", name: name.trim() });
+    }
+  );
+});
+
+router.put("/password", auth, (req, res) => {
+  const db = req.app.get("db");
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword)
+    return res
+      .status(400)
+      .json({ message: "Current and new password required" });
+
+  db.get("SELECT * FROM users WHERE username = ?", req.user, (err, user) => {
+    if (err) return res.status(500).json({ message: "Server error" });
+    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!bcrypt.compareSync(currentPassword, user.password))
+      return res.status(401).json({ message: "Current password is incorrect" });
+
+    const hashed = bcrypt.hashSync(newPassword, 10);
+    db.run(
+      "UPDATE users SET password = ? WHERE username = ?",
+      [hashed, req.user],
+      (uErr) => {
+        if (uErr) return res.status(500).json({ message: "Update failed" });
+        res.json({ message: "Password changed" });
       }
     );
   });

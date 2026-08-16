@@ -6,7 +6,8 @@
     "description": "Team quiz application with admin panel and Excel upload",
     "main": "server.js",
     "scripts": {
-        "start": "node server.js"
+        "start": "node server.js",
+        "test": "node --test"
     },
     "dependencies": {
         "bcryptjs": "^2.4.3",

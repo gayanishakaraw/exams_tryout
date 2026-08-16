@@ -2,27 +2,12 @@ const express = require("express");
 const multer = require("multer");
 const xlsx = require("xlsx");
 const path = require("path");
-const jwt = require("jsonwebtoken");
-const { jwtSecret } = require("../config");
+const { adminOnly } = require("../middleware/auth");
 const parseChoices = require("../helpers/parseChoices");
 
 const router = express.Router();
 
 const upload = multer({ dest: "uploads/" });
-
-// Auth middleware
-function adminOnly(req, res, next) {
-  const header = req.headers.authorization;
-  if (!header) return res.status(403).send("Unauthorized");
-
-  const token = header.split(" ")[1];
-  jwt.verify(token, jwtSecret, (err, decoded) => {
-    if (err) return res.status(403).send("Invalid token");
-    if (decoded.username !== "admin") return res.status(403).send("Admin only");
-
-    next();
-  });
-}
 
 // Upload Excel
 router.post("/upload", adminOnly, upload.single("file"), (req, res) => {

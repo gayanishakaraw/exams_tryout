@@ -1,0 +1,154 @@
+const { test } = require("node:test");
+const assert = require("node:assert");
+const { setupServer, login } = require("./helpers");
+
+test("GET /api/questions without token returns 403", async () => {
+  const srv = await setupServer();
+  try {
+    const res = await fetch(`${srv.baseUrl}/api/questions`);
+    assert.strictEqual(res.status, 403);
+  } finally {
+    await srv.close();
+  }
+});
+
+test("GET /api/auth/me returns the current user", async () => {
+  const srv = await setupServer();
+  try {
+    const token = await login(srv.baseUrl, "admin", "admin123");
+    const res = await fetch(`${srv.baseUrl}/api/auth/me`, {
+      headers: { Authorization: "Bearer " + token },
+    });
+    assert.strictEqual(res.status, 200);
+    const data = await res.json();
+    assert.strictEqual(data.username, "admin");
+    assert.strictEqual(data.name, "Admin User");
+  } finally {
+    await srv.close();
+  }
+});
+
+test("PUT /api/auth/profile updates the name", async () => {
+  const srv = await setupServer();
+  try {
+    const token = await login(srv.baseUrl, "admin", "admin123");
+    const res = await fetch(`${srv.baseUrl}/api/auth/profile`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      body: JSON.stringify({ name: "New Name" }),
+    });
+    assert.strictEqual(res.status, 200);
+    const me = await (
+      await fetch(`${srv.baseUrl}/api/auth/me`, {
+        headers: { Authorization: "Bearer " + token },
+      })
+    ).json();
+    assert.strictEqual(me.name, "New Name");
+  } finally {
+    await srv.close();
+  }
+});
+
+test("PUT /api/auth/password rejects a wrong current password", async () => {
+  const srv = await setupServer();
+  try {
+    const token = await login(srv.baseUrl, "admin", "admin123");
+    const res = await fetch(`${srv.baseUrl}/api/auth/password`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      body: JSON.stringify({
+        currentPassword: "wrong",
+        newPassword: "whatever123",
+      }),
+    });
+    assert.strictEqual(res.status, 401);
+  } finally {
+    await srv.close();
+  }
+});
+
+test("PUT /api/auth/password changes password and allows new login", async () => {
+  const srv = await setupServer();
+  try {
+    const token = await login(srv.baseUrl, "admin", "admin123");
+    const res = await fetch(`${srv.baseUrl}/api/auth/password`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      body: JSON.stringify({
+        currentPassword: "admin123",
+        newPassword: "newpass123",
+      }),
+    });
+    assert.strictEqual(res.status, 200);
+    const newToken = await login(srv.baseUrl, "admin", "newpass123");
+    assert.ok(newToken);
+  } finally {
+    await srv.close();
+  }
+});
+
+test("POST /api/admin/upload with a non-admin token returns 403", async () => {
+  const srv = await setupServer();
+  try {
+    const registerRes = await fetch(`${srv.baseUrl}/api/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: "regular", password: "regular123" }),
+    });
+    const { token } = await registerRes.json();
+    assert.ok(token);
+
+    const res = await fetch(`${srv.baseUrl}/api/admin/upload`, {
+      method: "POST",
+      headers: { Authorization: "Bearer " + token },
+    });
+    assert.strictEqual(res.status, 403);
+  } finally {
+    await srv.close();
+  }
+});
+
+test("PUT /api/auth/profile with an empty name returns 400", async () => {
+  const srv = await setupServer();
+  try {
+    const token = await login(srv.baseUrl, "admin", "admin123");
+    const res = await fetch(`${srv.baseUrl}/api/auth/profile`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      body: JSON.stringify({ name: "   " }),
+    });
+    assert.strictEqual(res.status, 400);
+  } finally {
+    await srv.close();
+  }
+});
+
+test("PUT /api/auth/password with a missing field returns 400", async () => {
+  const srv = await setupServer();
+  try {
+    const token = await login(srv.baseUrl, "admin", "admin123");
+    const res = await fetch(`${srv.baseUrl}/api/auth/password`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      body: JSON.stringify({ currentPassword: "admin123" }),
+    });
+    assert.strictEqual(res.status, 400);
+  } finally {
+    await srv.close();
+  }
+});
