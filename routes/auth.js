@@ -89,4 +89,30 @@ router.put("/profile", auth, (req, res) => {
   );
 });
 
+router.put("/password", auth, (req, res) => {
+  const db = req.app.get("db");
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword)
+    return res
+      .status(400)
+      .json({ message: "Current and new password required" });
+
+  db.get("SELECT * FROM users WHERE username = ?", req.user, (err, user) => {
+    if (err || !user)
+      return res.status(404).json({ message: "User not found" });
+    if (!bcrypt.compareSync(currentPassword, user.password))
+      return res.status(401).json({ message: "Current password is incorrect" });
+
+    const hashed = bcrypt.hashSync(newPassword, 10);
+    db.run(
+      "UPDATE users SET password = ? WHERE username = ?",
+      [hashed, req.user],
+      (uErr) => {
+        if (uErr) return res.status(500).json({ message: "Update failed" });
+        res.json({ message: "Password changed" });
+      }
+    );
+  });
+});
+
 module.exports = router;

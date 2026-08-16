@@ -51,3 +51,47 @@ test("PUT /api/auth/profile updates the name", async () => {
     await srv.close();
   }
 });
+
+test("PUT /api/auth/password rejects a wrong current password", async () => {
+  const srv = await setupServer();
+  try {
+    const token = await login(srv.baseUrl, "admin", "admin123");
+    const res = await fetch(`${srv.baseUrl}/api/auth/password`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      body: JSON.stringify({
+        currentPassword: "wrong",
+        newPassword: "whatever123",
+      }),
+    });
+    assert.strictEqual(res.status, 401);
+  } finally {
+    await srv.close();
+  }
+});
+
+test("PUT /api/auth/password changes password and allows new login", async () => {
+  const srv = await setupServer();
+  try {
+    const token = await login(srv.baseUrl, "admin", "admin123");
+    const res = await fetch(`${srv.baseUrl}/api/auth/password`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      body: JSON.stringify({
+        currentPassword: "admin123",
+        newPassword: "newpass123",
+      }),
+    });
+    assert.strictEqual(res.status, 200);
+    const newToken = await login(srv.baseUrl, "admin", "newpass123");
+    assert.ok(newToken);
+  } finally {
+    await srv.close();
+  }
+});
