@@ -22,6 +22,14 @@
 
     <div class="card">
       <div class="card-head">
+        <h3>Registered Users</h3>
+        <button class="btn btn-secondary" onclick="loadUsers()">Refresh</button>
+      </div>
+      <div id="usersBody"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
         <h3>User Scores</h3>
         <button class="btn btn-secondary" onclick="loadScores()">Refresh</button>
       </div>
@@ -125,8 +133,56 @@
         </table>`;
     }
 
+    async function loadUsers() {
+      const body = document.getElementById("usersBody");
+      body.innerHTML = "<p class='hint'>Loading…</p>";
+      try {
+        const res = await fetch("/api/admin/users", {
+          headers: { Authorization: "Bearer " + localStorage.getItem("token") },
+        });
+        if (!res.ok) {
+          body.innerHTML =
+            "<p class='form-msg error'>" +
+            (res.status === 403
+              ? "Admin access required."
+              : "Failed to load users.") +
+            "</p>";
+          return;
+        }
+        renderUsers(await res.json());
+      } catch (e) {
+        body.innerHTML = "<p class='form-msg error'>Failed to load users.</p>";
+      }
+    }
+
+    function renderUsers(rows) {
+      const body = document.getElementById("usersBody");
+      if (!rows.length) {
+        body.innerHTML = "<p class='hint'>No registered users.</p>";
+        return;
+      }
+      const rowsHtml = rows
+        .map(
+          (u) => `
+            <tr>
+              <td>${escapeHtml(u.name)}</td>
+              <td>${escapeHtml(u.username)}</td>
+            </tr>`
+        )
+        .join("");
+      body.innerHTML = `
+        <table class="data-table">
+          <thead>
+            <tr><th>Name</th><th>Username</th></tr>
+          </thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>`;
+    }
+
+    loadUsers();
     loadScores();
   </script>
+  <script src="footer.js"></script>
 </body>
 
 </html>
