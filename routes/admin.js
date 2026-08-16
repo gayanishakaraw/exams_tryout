@@ -40,4 +40,13 @@ router.post("/upload", adminOnly, upload.single("file"), (req, res) => {
   res.json({ message: "Questions imported successfully" });
 });
 
+// List all registered users (never expose password hashes).
+router.get("/users", adminOnly, (req, res) => {
+  const db = req.app.get("db");
+  db.all("SELECT id, username, name FROM users ORDER BY id", (err, rows) => {
+    if (err) return res.status(500).json({ message: "Failed to load users" });
+    res.json(rows);
+  });
+});
+
 module.exports = router;
