@@ -141,3 +141,6 @@ vite.config.ts.timestamp-*
 uploads/
 # Visual companion mockups
 .superpowers/
+db.sqlite
+data/footer.html
+db.sqlite
